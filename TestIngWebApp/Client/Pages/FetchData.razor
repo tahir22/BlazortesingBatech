@@ -1,0 +1,63 @@
+﻿@page "/fetchdata"
+@using TestIngWebApp.Shared
+@using TestIngWebApp.Client.Components
+@inject HttpClient Http
+@using TestIngWebApp.Client.Shared
+@using TestIngWebApp.Client.Services
+
+@*@inherits APICrudBaseV2<UserRolesViewModel, UserRolesListModel, string, UserAdditionalValueViewModel,   InternalUserService >*@
+@inherits APICrudBaseV2<WeatherForecast, WeatherForecast, string, UserAdditionalValueViewModel,   InternalUserService >
+ 
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+<FluentCard IsBusy="@IsTableBusy">
+    <Notification Content="@Error" Type="NotificationCssClass.Danger"></Notification>
+
+    @if (forecasts == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Temp. (C)</th>
+                    <th>Temp. (F)</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var forecast in Items)
+                {
+                    <tr>
+                        <td>@forecast.Date.ToShortDateString()</td>
+                        <td>@forecast.TemperatureC</td>
+                        <td>@forecast.TemperatureF</td>
+                        <td>@forecast.Summary</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+
+
+
+    <EditForm Model="@BaseIndexModel.CurrentIndex">
+        <PaginationStrip @bind-Value="BaseIndexModel.CurrentIndex" TotalPages="TotalPages" TotalRows="TotalRows"></PaginationStrip>
+    </EditForm>
+
+</FluentCard>
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+    }
+
+}
